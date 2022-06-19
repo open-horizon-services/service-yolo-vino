@@ -4,6 +4,7 @@
 include ../../checks.mk
 
 # Give this service a name, version number, and pattern name
+DOCKER_HUB_ID ?= "ibmosquito"
 SERVICE_NAME:="openvino"
 SERVICE_VERSION:="1.1.0"
 PATTERN_NAME:="pattern-openvino"
@@ -17,7 +18,7 @@ CONTAINER_CREDS:=
 
 build: check-dockerhubid
 	@echo "Building the OpenVino plugin for Movidius hardware"
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .; \
+	docker build -t $(DOCKER_HUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .; \
 
 run: check-dockerhubid
 	-docker network create mqtt-net 2>/dev/null || :
@@ -28,7 +29,7 @@ run: check-dockerhubid
           --name $(SERVICE_NAME) \
           -e OPENVINO_PLUGIN=MYRIAD \
           --network=host \
-          $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
+          $(DOCKER_HUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
 
 dev: check-dockerhubid
 	-docker network create mqtt-net 2>/dev/null || :
@@ -40,7 +41,7 @@ dev: check-dockerhubid
           -e OPENVINO_PLUGIN=MYRIAD \
           --privileged -v /dev:/dev \
           --network=host \
-          $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) /bin/bash
+          $(DOCKER_HUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) /bin/bash
 
 stop: check-dockerhubid
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
@@ -52,13 +53,13 @@ test:
 
 clean: check-dockerhubid
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
-	-docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
+	-docker rmi $(DOCKER_HUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
 
 publish-service:
 	@ARCH=$(ARCH) \
 	    SERVICE_NAME="$(SERVICE_NAME)" \
 	    SERVICE_VERSION="$(SERVICE_VERSION)"\
-	    SERVICE_CONTAINER="$(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)" \
+	    SERVICE_CONTAINER="$(DOCKER_HUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)" \
 	    hzn exchange service publish -O $(CONTAINER_CREDS) -P -f service.json --public=true
 
 publish-pattern:
