@@ -1,0 +1,35 @@
+{
+    "org": "$HZN_ORG_ID",
+    "label": "$SERVICE_NAME for $ARCH",
+    "description": "A yolo plugin using openvino",
+    "documentation": "https://github.com/TheMosquito/achatina/blob/master/plugins/openvino/Makefile",
+    "url": "$SERVICE_NAME",
+    "version": "$SERVICE_VERSION",
+    "arch": "$ARCH",
+    "sharable": "singleton",
+    "requiredServices": [
+        {
+            "url": "restcam",
+            "org": "$HZN_ORG_ID",
+            "versionRange": "[0.0.0,INFINITY)",
+            "arch": "$ARCH"
+        }
+    ],
+    "userInput": [
+        {
+            "name": "OPENVINO_PLUGIN",
+            "label": "The openvino plugin",
+            "type": "string",
+            "defaultValue": "MYRIAD"
+        }
+    ],
+    "deployment": {
+        "services": {
+            "openvino": {
+                "image": "$SERVICE_CONTAINER",
+                "privileged": true,
+                "devices": ["/dev:/dev"]
+            }
+        }
+    }
+}
